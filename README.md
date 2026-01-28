@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Who Owes Who
 
-## Getting Started
+A premium, privacy-first debt settlement calculator built with Next.js and TypeScript. Track shared expenses, simplify repayments with a smart algorithm, and visualize the money flow with a dynamic graph.
 
-First, run the development server:
+![Who Owes Who Premium UI](https://img.shields.io/badge/UI-Glassmorphism-indigo)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **💎 Premium Glassmorphic UI**: A modern, sleek dark theme with indigo/slate gradients and refined typography.
+- **🧮 Smart Debt Simplification**: A greedy algorithm that minimizes the number of transactions needed to settle all debts.
+- **📊 Visual Settlement Graph**: A dynamic, animated canvas-based graph representing the flow of money between people.
+- **✅ "Settle Up" Logic**: Record repayments directly with a single click, automatically balancing the ledger.
+- **💾 LocalStorage Persistence**: Your data stays in your browser. Payments are automatically saved and persist across refreshes.
+- **📂 Data Portability**: Export your entire payment history to a JSON file and import it anytime to restore your data.
+- **✨ Fancy Animations**: Smooth transitions, an animated title that cycles through settlements, and interactive graph enlargement.
+- **🛡️ Privacy First**: No signups, no databases, no tracking. Everything happens on your device.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Styling**: Vanilla CSS (Modern CSS variables, Flexbox/Grid, Backdrop-filter)
+- **Math**: Custom Greedy Debt Simplification Algorithm
 
-## Learn More
+## ⚙️ Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/yourusername/who-owes-who.git
+    cd who-owes-who
+    ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2.  **Install dependencies:**
+    ```bash
+    pnpm install
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3.  **Run the development server:**
+    ```bash
+    pnpm dev
+    ```
 
-## Deploy on Vercel
+4.  **Build for production:**
+    ```bash
+    pnpm build
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📜 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
