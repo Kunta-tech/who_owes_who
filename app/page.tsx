@@ -52,6 +52,15 @@ export default function Home() {
       </header>
 
       <main className="main">
+        <MainBottom
+          payments={payments}
+          onEdit={id => setActiveId(id)}
+          onRemove={id =>
+            setPayments(p => p.filter(x => x.id !== id))
+          }
+          onClearAll={() => setPayments([])}
+        />
+
         <MainLeft
           activePayment={payments.find(p => p.id === activeId) ?? null}
           onSave={savePayment}
@@ -61,15 +70,6 @@ export default function Home() {
           isOpen={isGraphOpen}
           onClose={() => setIsGraphOpen(false)}
           settlements={settlements}
-        />
-
-        <MainBottom
-          payments={payments}
-          onEdit={id => setActiveId(id)}
-          onRemove={id =>
-            setPayments(p => p.filter(x => x.id !== id))
-          }
-          onClearAll={() => setPayments([])}
         />
       </main>
     </>

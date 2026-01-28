@@ -65,7 +65,7 @@ body {
 @media (min-width: 1024px) {
   .main {
     display: grid;
-    grid-template-columns: 420px 1fr;
+    grid-template-columns: 1fr 420px;
     align-items: start;
   }
 }
@@ -153,8 +153,8 @@ body {
 .graph {
   position: fixed;
   top: 72px;
-  right: -450px;
-  width: 400px;
+  right: -65vw;
+  width: 60vw;
   height: calc(100vh - 72px);
   background: var(--panel-solid);
   backdrop-filter: var(--glass);
@@ -162,26 +162,35 @@ body {
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
   z-index: 20;
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 .graph.open {
   right: 0;
 }
 
-.canvas {
-  flex: 1;
+.canvas-container {
+  transition: height 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  background: rgba(0, 0, 0, 0.2);
   border: 1px dashed var(--border);
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.2);
 }
+
+.canvas-container.enlarged {
+  height: 65vh !important;
+}
+
+.canvas-container:not(.enlarged) {
+  height: 350px;
+}
+
 
 /* Summary / Bottom */
 
 .summary {
-  grid-column: 1 / -1;
   background: var(--panel);
   backdrop-filter: var(--glass);
   border: 1px solid var(--border);

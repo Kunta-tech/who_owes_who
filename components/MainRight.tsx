@@ -1,5 +1,5 @@
 import { CURRENCY } from "@/src/lib/constants";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   isOpen: boolean;
@@ -9,139 +9,151 @@ type Props = {
 
 export default function MainRight({ isOpen, onClose, settlements }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isEnlarged, setIsEnlarged] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
 
-    // Set canvas resolution
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    // Delay to let CSS transition finish
+    const timeout = setTimeout(() => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-    const width = rect.width;
-    const height = rect.height;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
 
-    // Extract unique participants
-    const participants = Array.from(
-      new Set(settlements.flatMap((s) => [s.from, s.to]))
-    );
-    const nodes: Record<string, { x: number; y: number }> = {};
+      const width = rect.width;
+      const height = rect.height;
 
-    // Circular layout
-    const radius = Math.min(width, height) * 0.3;
-    const centerX = width / 2;
-    const centerY = height / 2;
+      const participants = Array.from(
+        new Set(settlements.flatMap((s) => [s.from, s.to]))
+      );
+      const nodes: Record<string, { x: number; y: number }> = {};
 
-    participants.forEach((name, i) => {
-      const angle = (i / participants.length) * Math.PI * 2;
-      nodes[name] = {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle),
-      };
-    });
+      const radius = Math.min(width, height) * 0.35;
+      const centerX = width / 2;
+      const centerY = height / 2;
 
-    let animationFrame: number;
-    let progress = 0;
+      participants.forEach((name, i) => {
+        const angle = (i / participants.length) * Math.PI * 2;
+        nodes[name] = {
+          x: centerX + radius * Math.cos(angle),
+          y: centerY + radius * Math.sin(angle),
+        };
+      });
 
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
+      let animationFrame: number;
+      let progress = 0;
 
-      // Draw Edges (Arrows)
-      settlements.forEach((s) => {
-        const start = nodes[s.from];
-        const end = nodes[s.to];
-        if (!start || !end) return;
+      const render = () => {
+        ctx.clearRect(0, 0, width, height);
 
-        const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        const nodeRadius = 25;
+        // Draw Edges (Arrows)
+        settlements.forEach((s) => {
+          const start = nodes[s.from];
+          const end = nodes[s.to];
+          if (!start || !end) return;
 
-        // Offset start and end points to edge of circles
-        const adjStartX = start.x + nodeRadius * Math.cos(angle);
-        const adjStartY = start.y + nodeRadius * Math.sin(angle);
-        const adjEndX = end.x - nodeRadius * Math.cos(angle);
-        const adjEndY = end.y - nodeRadius * Math.sin(angle);
+          const angle = Math.atan2(end.y - start.y, end.x - start.x);
+          const nodeRadius = 25;
 
-        // Animate edge drawing
-        const currentX = adjStartX + (adjEndX - adjStartX) * Math.min(progress, 1);
-        const currentY = adjStartY + (adjEndY - adjStartY) * Math.min(progress, 1);
+          // Offset start and end points to edge of circles
+          const adjStartX = start.x + nodeRadius * Math.cos(angle);
+          const adjStartY = start.y + nodeRadius * Math.sin(angle);
+          const adjEndX = end.x - nodeRadius * Math.cos(angle);
+          const adjEndY = end.y - nodeRadius * Math.sin(angle);
 
-        ctx.beginPath();
-        ctx.moveTo(adjStartX, adjStartY);
-        ctx.lineTo(currentX, currentY);
-        ctx.strokeStyle = "rgba(99, 102, 241, 0.6)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+          // Animate edge drawing
+          const currentX = adjStartX + (adjEndX - adjStartX) * Math.min(progress, 1);
+          const currentY = adjStartY + (adjEndY - adjStartY) * Math.min(progress, 1);
 
-        if (progress >= 1) {
-          // Draw arrowhead
           ctx.beginPath();
-          ctx.moveTo(adjEndX, adjEndY);
-          ctx.lineTo(
-            adjEndX - 10 * Math.cos(angle - Math.PI / 6),
-            adjEndY - 10 * Math.sin(angle - Math.PI / 6)
-          );
-          ctx.moveTo(adjEndX, adjEndY);
-          ctx.lineTo(
-            adjEndX - 10 * Math.cos(angle + Math.PI / 6),
-            adjEndY - 10 * Math.sin(angle + Math.PI / 6)
-          );
-          ctx.strokeStyle = "rgba(129, 140, 248, 1)";
+          ctx.moveTo(adjStartX, adjStartY);
+          ctx.lineTo(currentX, currentY);
+          ctx.strokeStyle = "rgba(99, 102, 241, 0.6)";
+          ctx.lineWidth = 2;
           ctx.stroke();
 
-          // Draw amount text
-          ctx.fillStyle = "#9ca3af";
-          ctx.font = "10px JetBrains Mono";
-          const midX = (adjStartX + adjEndX) / 2;
-          const midY = (adjStartY + adjEndY) / 2;
+          if (progress >= 1) {
+            // Draw arrowhead
+            ctx.beginPath();
+            ctx.moveTo(adjEndX, adjEndY);
+            ctx.lineTo(
+              adjEndX - 10 * Math.cos(angle - Math.PI / 6),
+              adjEndY - 10 * Math.sin(angle - Math.PI / 6)
+            );
+            ctx.moveTo(adjEndX, adjEndY);
+            ctx.lineTo(
+              adjEndX - 10 * Math.cos(angle + Math.PI / 6),
+              adjEndY - 10 * Math.sin(angle + Math.PI / 6)
+            );
+            ctx.strokeStyle = "rgba(129, 140, 248, 1)";
+            ctx.stroke();
+
+            // Draw amount text
+            ctx.fillStyle = "#9ca3af";
+            ctx.font = "10px JetBrains Mono";
+            const midX = (adjStartX + adjEndX) / 2;
+            const midY = (adjStartY + adjEndY) / 2;
+            ctx.textAlign = "center";
+            ctx.fillText(`${CURRENCY}${s.amount}`, midX, midY - 8);
+          }
+        });
+
+        // Draw Nodes
+        participants.forEach((name) => {
+          const node = nodes[name];
+
+          // Node background
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 25, 0, Math.PI * 2);
+          ctx.fillStyle = "#1e1b4b";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.stroke();
+
+          // Node text
+          ctx.fillStyle = "#f3f4f6";
+          ctx.font = "bold 10px Inter";
           ctx.textAlign = "center";
-          ctx.fillText(`${CURRENCY}${s.amount}`, midX, midY - 8);
+          ctx.fillText(name, node.x, node.y + 4);
+        });
+
+        if (progress < 1) {
+          progress += 0.02;
+          animationFrame = requestAnimationFrame(render);
         }
-      });
+      };
 
-      // Draw Nodes
-      participants.forEach((name) => {
-        const node = nodes[name];
+      render();
+      return () => cancelAnimationFrame(animationFrame);
+    }, 350);
 
-        // Node background
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, 25, 0, Math.PI * 2);
-        ctx.fillStyle = "#1e1b4b";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-        ctx.stroke();
-
-        // Node text
-        ctx.fillStyle = "#f3f4f6";
-        ctx.font = "bold 10px Inter";
-        ctx.textAlign = "center";
-        ctx.fillText(name, node.x, node.y + 4);
-      });
-
-      if (progress < 1) {
-        progress += 0.02;
-        animationFrame = requestAnimationFrame(render);
-      }
-    };
-
-    render();
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [isOpen, settlements]);
+    return () => clearTimeout(timeout);
+  }, [isOpen, settlements, isEnlarged]);
 
   return (
-    <section className={`panel graph ${isOpen ? "open" : ""}`}>
+    <section className={`panel graph ${isOpen ? "open" : ""}`} style={{ overflowY: 'auto' }}>
       <div className="panel-header">
         <h2>Visual Graph</h2>
-        <button onClick={onClose}>Close</button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            className="mono"
+            style={{ fontSize: '0.75rem', padding: '0.4rem 0.8rem' }}
+            onClick={() => setIsEnlarged(!isEnlarged)}
+          >
+            {isEnlarged ? "Collapse" : "Enlarge"}
+          </button>
+          <button onClick={onClose}>Close</button>
+        </div>
       </div>
 
-      <div className="canvas-container" style={{ flex: 1, position: 'relative', minHeight: '300px' }}>
+      <div className={`canvas-container ${isEnlarged ? 'enlarged' : ''}`}>
         <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
       </div>
 
