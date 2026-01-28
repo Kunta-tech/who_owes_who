@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Payment, Participant } from "@/src/lib/types";
+import { Plus, Trash2, Save } from "lucide-react";
 
 type Props = {
   activePayment: Payment | null;
@@ -19,7 +20,7 @@ const emptyPayment = (): Payment => ({
   total: 0,
   paidBy: {},
   sharedAmong: {},
-  createdAt: Date.now(),
+  timestamp: Date.now(),
 });
 
 function recordToRows(
@@ -108,6 +109,7 @@ export default function MainLeft({
       <div className="panel-header">
         <h2>{activePayment ? "Edit Payment" : "New Payment"}</h2>
         <button className="primary" onClick={save}>
+          {activePayment ? <Save size={16} /> : <Plus size={16} />}
           {activePayment ? "Update" : "Add Payment"}
         </button>
       </div>
@@ -271,7 +273,7 @@ function Section({
               setRows(rows.filter((_, x) => x !== i))
             }
           >
-            ×
+            <Trash2 size={14} />
           </button>
         </div>
       ))}
@@ -284,7 +286,7 @@ function Section({
           ])
         }
       >
-        + Add
+        <Plus size={14} /> Add Participant
       </button>
     </div>
   );

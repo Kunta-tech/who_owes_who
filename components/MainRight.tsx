@@ -1,13 +1,15 @@
 import { CURRENCY } from "@/src/lib/constants";
 import { useEffect, useRef, useState } from "react";
+import { X, CheckCircle2, Maximize2, Minimize2 } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   settlements: { from: string; to: string; amount: number }[];
+  onSettle: (from: string, to: string, amount: number) => void;
 };
 
-export default function MainRight({ isOpen, onClose, settlements }: Props) {
+export default function MainRight({ isOpen, onClose, settlements, onSettle }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isEnlarged, setIsEnlarged] = useState(false);
 
@@ -147,9 +149,10 @@ export default function MainRight({ isOpen, onClose, settlements }: Props) {
             style={{ fontSize: '0.75rem', padding: '0.4rem 0.8rem' }}
             onClick={() => setIsEnlarged(!isEnlarged)}
           >
+            {isEnlarged ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             {isEnlarged ? "Collapse" : "Enlarge"}
           </button>
-          <button onClick={onClose}>Close</button>
+          <button onClick={onClose}><X size={16} /> Close</button>
         </div>
       </div>
 
@@ -164,9 +167,18 @@ export default function MainRight({ isOpen, onClose, settlements }: Props) {
         ) : (
           settlements.map((s, i) => (
             <div key={i} className="payment-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
-              <span className="mono">{s.from}</span>
-              <span className="muted" style={{ fontSize: '0.8rem' }}>→ {CURRENCY}{s.amount} →</span>
-              <span className="mono">{s.to}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span className="mono">{s.from}</span>
+                <span className="muted" style={{ fontSize: '0.8rem' }}>→ {CURRENCY}{s.amount} →</span>
+                <span className="mono">{s.to}</span>
+              </div>
+              <button
+                className="primary"
+                style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
+                onClick={() => onSettle(s.from, s.to, s.amount)}
+              >
+                <CheckCircle2 size={14} /> Settle Up
+              </button>
             </div>
           ))
         )}

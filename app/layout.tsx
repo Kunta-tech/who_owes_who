@@ -25,12 +25,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <header className="header">
-          <h1>Who Owes Who</h1>
-          <span className="tagline">
-            Paste payments. Get settlements. No signup.
-          </span>
-        </header>
 
         {children}
 

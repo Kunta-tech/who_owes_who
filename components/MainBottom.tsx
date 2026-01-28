@@ -1,5 +1,6 @@
 import { Payment } from "@/src/lib/types";
 import { CURRENCY } from "@/src/lib/constants";
+import { Trash2, Pencil } from "lucide-react";
 
 type Props = {
   payments: Payment[];
@@ -25,7 +26,7 @@ export default function MainBottom({
               onClearAll();
             }
           }}>
-            Clear All
+            <Trash2 size={16} /> Clear All
           </button>
         )}
       </div>
@@ -43,13 +44,13 @@ export default function MainBottom({
 
               <div className="actions" style={{ display: 'flex', gap: '0.5rem' }}>
                 <button onClick={() => onEdit(p.id)}>
-                  Edit
+                  <Pencil size={14} /> Edit
                 </button>
                 <button
                   className="danger"
                   onClick={() => onRemove(p.id)}
                 >
-                  Delete
+                  <Trash2 size={14} /> Delete
                 </button>
               </div>
             </div>

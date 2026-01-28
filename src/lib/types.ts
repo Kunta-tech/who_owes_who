@@ -8,5 +8,5 @@ export type Payment = {
   paidBy: Record<Participant, number>;
   sharedAmong: Record<Participant, number>;
 
-  createdAt: number;
+  timestamp: number;
 };
