@@ -110,7 +110,7 @@ export default function MainLeft({
         <h2>{activePayment ? "Edit Payment" : "New Payment"}</h2>
         <button className="primary" onClick={save}>
           {activePayment ? <Save size={16} /> : <Plus size={16} />}
-          {activePayment ? "Update" : "Add Payment"}
+          <span className="button-text">{activePayment ? "Update" : "Add Payment"}</span>
         </button>
       </div>
 
@@ -286,7 +286,7 @@ function Section({
           ])
         }
       >
-        <Plus size={14} /> Add Participant
+        <Plus size={14} /> <span className="button-text">Add Participant</span>
       </button>
     </div>
   );

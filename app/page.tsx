@@ -130,14 +130,14 @@ export default function Home() {
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button onClick={handleExport} style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>
-            <Download size={14} /> Export JSON
+            <Download size={14} /> <span className="button-text">Export JSON</span>
           </button>
           <label className="button" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', padding: '0.4rem 0.8rem', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid var(--border)', fontWeight: 600 }}>
-            <Upload size={14} /> Import JSON
+            <Upload size={14} /> <span className="button-text">Import JSON</span>
             <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
           </label>
           <button className="primary" onClick={() => setIsGraphOpen(true)}>
-            <Network size={16} /> Show Settlements
+            <Network size={16} /> <span className="button-text">Show Settlements</span>
           </button>
         </div>
       </header>

@@ -26,7 +26,7 @@ export default function MainBottom({
               onClearAll();
             }
           }}>
-            <Trash2 size={16} /> Clear All
+            <Trash2 size={16} /> <span className="button-text">Clear All</span>
           </button>
         )}
       </div>
@@ -44,13 +44,13 @@ export default function MainBottom({
 
               <div className="actions" style={{ display: 'flex', gap: '0.5rem' }}>
                 <button onClick={() => onEdit(p.id)}>
-                  <Pencil size={14} /> Edit
+                  <Pencil size={14} /> <span className="button-text">Edit</span>
                 </button>
                 <button
                   className="danger"
                   onClick={() => onRemove(p.id)}
                 >
-                  <Trash2 size={14} /> Delete
+                  <Trash2 size={14} /> <span className="button-text">Delete</span>
                 </button>
               </div>
             </div>
