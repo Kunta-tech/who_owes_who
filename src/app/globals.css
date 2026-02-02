@@ -287,6 +287,35 @@ button.danger:hover {
   .button-text {
     display: none;
   }
+
+  .header {
+    padding: 1rem;
+  }
+
+  .main {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .panel-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .payment-summary-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .payment-summary-item .actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .payment-summary-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mono {

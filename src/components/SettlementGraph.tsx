@@ -154,9 +154,9 @@ export default function SettlementGraph({ isOpen, onClose, settlements, onSettle
             onClick={() => setIsEnlarged(!isEnlarged)}
           >
             {isEnlarged ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-            {isEnlarged ? "Collapse" : "Enlarge"}
+            <span className="button-text">{isEnlarged ? "Collapse" : "Enlarge"}</span>
           </button>
-          <button onClick={onClose}><X size={16} /> Close</button>
+          <button onClick={onClose}><X size={16} /> <span className="button-text">Close</span></button>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default function SettlementGraph({ isOpen, onClose, settlements, onSettle
                 style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
                 onClick={() => onSettle(s.from, s.to, s.amount)}
               >
-                <CheckCircle2 size={14} /> Settle Up
+                <CheckCircle2 size={14} /> <span className="button-text">Settle Up</span>
               </button>
             </div>
           ))
