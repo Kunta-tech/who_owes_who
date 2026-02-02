@@ -1,5 +1,5 @@
-import { Payment } from "@/src/lib/types";
-import { CURRENCY } from "@/src/lib/constants";
+import { Payment } from "@/lib/types";
+import { CURRENCY } from "@/lib/constants";
 import { Trash2, Pencil } from "lucide-react";
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
   onClearAll: () => void;
 };
 
-export default function MainBottom({
+export default function PaymentList({
   payments,
   onEdit,
   onRemove,

@@ -1,4 +1,4 @@
-import { Payment, Participant } from "../src/lib/types";
+import { Payment, Participant } from "./types";
 
 export function computeLedger(
   payments: Payment[]

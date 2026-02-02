@@ -1,4 +1,4 @@
-import { CURRENCY } from "@/src/lib/constants";
+import { CURRENCY } from "@/lib/constants";
 import { useEffect, useRef, useState } from "react";
 import { X, CheckCircle2, Maximize2, Minimize2 } from "lucide-react";
 
@@ -9,7 +9,7 @@ type Props = {
   onSettle: (from: string, to: string, amount: number) => void;
 };
 
-export default function MainRight({ isOpen, onClose, settlements, onSettle }: Props) {
+export default function SettlementGraph({ isOpen, onClose, settlements, onSettle }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isEnlarged, setIsEnlarged] = useState(false);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Payment, Participant } from "@/src/lib/types";
+import { Payment, Participant } from "@/lib/types";
 import { Plus, Trash2, Save } from "lucide-react";
 
 type Props = {
@@ -11,13 +11,17 @@ type Props = {
 
 type Row = {
   name: string;
-  amount: number;
+  amount: string;
 };
 
-const emptyPayment = (): Payment => ({
+type DraftPayment = Omit<Payment, "total"> & {
+  total: string;
+};
+
+const emptyPayment = (): DraftPayment => ({
   id: crypto.randomUUID(),
   description: "",
-  total: 0,
+  total: "",
   paidBy: {},
   sharedAmong: {},
   timestamp: Date.now(),
@@ -28,23 +32,24 @@ function recordToRows(
 ): Row[] {
   return Object.entries(record).map(([name, amount]) => ({
     name,
-    amount,
+    amount: String(amount),
   }));
 }
 
 function rowsToRecord(rows: Row[]): Record<string, number> {
   const out: Record<string, number> = {};
   rows.forEach(r => {
-    if (r.name) out[r.name] = r.amount;
+    const val = parseFloat(r.amount);
+    if (r.name && !isNaN(val)) out[r.name] = val;
   });
   return out;
 }
 
-export default function MainLeft({
+export default function PaymentForm({
   activePayment,
   onSave,
 }: Props) {
-  const [draft, setDraft] = useState<Payment>(
+  const [draft, setDraft] = useState<DraftPayment>(
     emptyPayment()
   );
 
@@ -52,20 +57,38 @@ export default function MainLeft({
   const [sharedRows, setSharedRows] = useState<Row[]>([]);
   const [splitMode, setSplitMode] = useState<"equal" | "custom">("equal");
 
-  const totalPaid = paidByRows.reduce((sum, r) => sum + r.amount, 0);
-  const totalShared = sharedRows.reduce((sum, r) => sum + r.amount, 0);
-  const isBalanced = Math.abs(totalPaid - draft.total) < 0.01 && Math.abs(totalShared - draft.total) < 0.01;
+  // total calculation for display
+  function safeEvaluate(expression: string): number {
+    // Only allow digits, dot, +, -, *, /, (, ), and whitespace
+    if (!/^[\d\.\+\-\*\/\(\)\s]+$/.test(expression)) {
+      return NaN;
+    }
+    try {
+      // safe because of the regex check above
+      // eslint-disable-next-line no-new-func
+      return new Function("return " + expression)();
+    } catch {
+      return NaN;
+    }
+  }
+
+  const totalPaid = paidByRows.reduce((sum, r) => sum + (safeEvaluate(r.amount) || 0), 0);
+  const totalShared = sharedRows.reduce((sum, r) => sum + (safeEvaluate(r.amount) || 0), 0);
+
+  const draftTotalNum = safeEvaluate(draft.total) || 0;
+  const isBalanced = Math.abs(totalPaid - draftTotalNum) < 0.01 && Math.abs(totalShared - draftTotalNum) < 0.01;
 
   useEffect(() => {
     if (splitMode !== "equal") return;
     if (sharedRows.length === 0) return;
 
-    const perHead = draft.total / sharedRows.length;
+    const total = safeEvaluate(draft.total) || 0;
+    const perHead = total / sharedRows.length;
 
     setSharedRows(rows =>
       rows.map(r => ({
         ...r,
-        amount: Number(perHead.toFixed(2)),
+        amount: isNaN(perHead) ? "" : perHead.toFixed(2),
       }))
     );
   }, [splitMode, draft.total, sharedRows.length]);
@@ -74,7 +97,10 @@ export default function MainLeft({
   /* Load when editing */
   useEffect(() => {
     if (activePayment) {
-      setDraft(activePayment);
+      setDraft({
+        ...activePayment,
+        total: String(activePayment.total),
+      });
       setPaidByRows(recordToRows(activePayment.paidBy));
       setSharedRows(
         recordToRows(activePayment.sharedAmong)
@@ -92,15 +118,41 @@ export default function MainLeft({
   }
 
   function save() {
+    const totalNum = safeEvaluate(draft.total);
+    if (isNaN(totalNum)) {
+      alert("Please enter a valid total amount (math allowed: +, -, *, /).");
+      return;
+    }
+
+    // Validate rows
+    const invalidRows = [...paidByRows, ...sharedRows].some(r => isNaN(safeEvaluate(r.amount)));
+    if (invalidRows) {
+      alert("Please ensure all participant amounts are valid numbers or expressions.");
+      return;
+    }
+
     if (!isBalanced) {
       alert("Totals don't match the payment total!");
       return;
     }
+
+    // Convert rows to evaluated numbers
+    const finalPaidBy: Record<string, number> = {};
+    paidByRows.forEach(r => {
+      if (r.name) finalPaidBy[r.name] = safeEvaluate(r.amount) || 0;
+    });
+
+    const finalSharedAmong: Record<string, number> = {};
+    sharedRows.forEach(r => {
+      if (r.name) finalSharedAmong[r.name] = safeEvaluate(r.amount) || 0;
+    });
+
     onSave({
       ...draft,
-      paidBy: rowsToRecord(paidByRows),
-      sharedAmong: rowsToRecord(sharedRows),
-    });
+      total: totalNum,
+      paidBy: finalPaidBy,
+      sharedAmong: finalSharedAmong,
+    } as Payment);
     reset();
   }
 
@@ -129,12 +181,14 @@ export default function MainLeft({
         <div className="row">
           <label>Total Amount</label>
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
+            placeholder="0.00"
             value={draft.total}
             onChange={e =>
               setDraft(d => ({
                 ...d,
-                total: Number(e.target.value),
+                total: e.target.value,
               }))
             }
           />
@@ -147,12 +201,21 @@ export default function MainLeft({
             rows={paidByRows}
             setRows={setPaidByRows}
             showAmount
+            onAdd={() => {
+              const total = safeEvaluate(draft.total) || 0;
+              const paid = paidByRows.reduce((sum, r) => sum + (safeEvaluate(r.amount) || 0), 0);
+              const remaining = total - paid;
+              setPaidByRows(prev => [
+                ...prev,
+                { name: "", amount: remaining > 0 ? String(remaining) : "" }
+              ]);
+            }}
           />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
             <span className="muted">Total Paid:</span>
-            <span style={{ color: Math.abs(totalPaid - draft.total) < 0.01 ? 'var(--accent)' : 'var(--danger)' }}>
-              {totalPaid} / {draft.total}
+            <span style={{ color: Math.abs(totalPaid - draftTotalNum) < 0.01 ? 'var(--accent)' : 'var(--danger)' }}>
+              {totalPaid.toFixed(2)} / {draftTotalNum.toFixed(2)}
             </span>
           </div>
 
@@ -167,8 +230,8 @@ export default function MainLeft({
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
             <span className="muted">Total Shared:</span>
-            <span style={{ color: Math.abs(totalShared - draft.total) < 0.01 ? 'var(--accent)' : 'var(--danger)' }}>
-              {totalShared} / {draft.total}
+            <span style={{ color: Math.abs(totalShared - draftTotalNum) < 0.01 ? 'var(--accent)' : 'var(--danger)' }}>
+              {totalShared.toFixed(2)} / {draftTotalNum.toFixed(2)}
             </span>
           </div>
         </div>
@@ -215,6 +278,7 @@ function Section({
   setRows,
   showAmount,
   amountDisabled = false,
+  onAdd,
 }: {
   title: string;
   rows: Row[];
@@ -223,6 +287,7 @@ function Section({
   >;
   showAmount: boolean;
   amountDisabled?: boolean;
+  onAdd?: () => void;
 }) {
   return (
     <div className="row">
@@ -252,7 +317,8 @@ function Section({
 
           {showAmount && (
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
               placeholder="Amount"
               disabled={amountDisabled}
               value={r.amount}
@@ -260,7 +326,7 @@ function Section({
                 const copy = [...rows];
                 copy[i] = {
                   ...copy[i],
-                  amount: Number(e.target.value),
+                  amount: e.target.value,
                 };
                 setRows(copy);
               }}
@@ -279,12 +345,16 @@ function Section({
       ))}
 
       <button
-        onClick={() =>
-          setRows(r => [
-            ...r,
-            { name: "", amount: 0 },
-          ])
-        }
+        onClick={() => {
+          if (onAdd) {
+            onAdd();
+          } else {
+            setRows(r => [
+              ...r,
+              { name: "", amount: "" },
+            ]);
+          }
+        }}
       >
         <Plus size={14} /> <span className="button-text">Add Participant</span>
       </button>

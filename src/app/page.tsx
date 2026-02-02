@@ -1,11 +1,11 @@
 "use client";
 
-import { computeLedger, computeSettlements } from "@/components/computeLedger";
-import MainBottom from "@/components/MainBottom";
-import MainLeft from "@/components/MainLeft";
-import MainRight from "@/components/MainRight";
-import { CURRENCY } from "@/src/lib/constants";
-import { Payment } from "@/src/lib/types";
+import { computeLedger, computeSettlements } from "@/lib/ledger";
+import PaymentList from "@/components/PaymentList";
+import PaymentForm from "@/components/PaymentForm";
+import SettlementGraph from "@/components/SettlementGraph";
+import { CURRENCY } from "@/lib/constants";
+import { Payment } from "@/lib/types";
 import { Network, Download, Upload, Wallet } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 
@@ -143,7 +143,7 @@ export default function Home() {
       </header>
 
       <main className="main">
-        <MainBottom
+        <PaymentList
           payments={payments}
           onEdit={id => setActiveId(id)}
           onRemove={id =>
@@ -152,12 +152,12 @@ export default function Home() {
           onClearAll={() => setPayments([])}
         />
 
-        <MainLeft
+        <PaymentForm
           activePayment={payments.find(p => p.id === activeId) ?? null}
           onSave={savePayment}
         />
 
-        <MainRight
+        <SettlementGraph
           isOpen={isGraphOpen}
           onClose={() => setIsGraphOpen(false)}
           settlements={settlements}
