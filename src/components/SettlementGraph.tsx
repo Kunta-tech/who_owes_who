@@ -55,6 +55,10 @@ export default function SettlementGraph({ isOpen, onClose, settlements, onSettle
       const render = () => {
         ctx.clearRect(0, 0, width, height);
 
+        // Define fonts based on isEnlarged
+        const edgeFont = isEnlarged ? "12px JetBrains Mono" : "10px JetBrains Mono";
+        const nodeFont = isEnlarged ? "bold 14px Inter" : "bold 10px Inter";
+
         // Draw Edges (Arrows)
         settlements.forEach((s) => {
           const start = nodes[s.from];
@@ -99,7 +103,7 @@ export default function SettlementGraph({ isOpen, onClose, settlements, onSettle
 
             // Draw amount text
             ctx.fillStyle = "#9ca3af";
-            ctx.font = "10px JetBrains Mono";
+            ctx.font = edgeFont;
             const midX = (adjStartX + adjEndX) / 2;
             const midY = (adjStartY + adjEndY) / 2;
             ctx.textAlign = "center";
@@ -121,7 +125,7 @@ export default function SettlementGraph({ isOpen, onClose, settlements, onSettle
 
           // Node text
           ctx.fillStyle = "#f3f4f6";
-          ctx.font = "bold 10px Inter";
+          ctx.font = nodeFont;
           ctx.textAlign = "center";
           ctx.fillText(name, node.x, node.y + 4);
         });
@@ -156,7 +160,7 @@ export default function SettlementGraph({ isOpen, onClose, settlements, onSettle
         </div>
       </div>
 
-      <div className={`canvas-container ${isEnlarged ? 'enlarged' : ''}`}>
+      <div className={`canvas-container ${isEnlarged ? 'enlarged' : ''}`} style={{ height: isEnlarged ? '65vh' : '350px' }}>
         <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
       </div>
 
